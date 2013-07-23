@@ -15,6 +15,7 @@ jQuery(window).load(function(){
 	initCallForm();
 	fixIE8();
 	initProjects();
+	fixDrop();
 })
 
 // clear inputs on focus
@@ -115,6 +116,32 @@ function fixIE8(){
 	}
 }
 
+function fixDrop(){
+	$('#main-nav li:has(.second-level)').each(function(){
+		var block = $(this);
+		var drops = $('.drop', block);
+		var targetDrop = $('.second-level', block);
+		var win = $(window);
+
+		function positionDrop(){
+			block.removeClass('left-drop');
+			drops.show();
+			if (targetDrop.offset().left + targetDrop.innerWidth() > $('#wrapper').innerWidth()) {
+				block.addClass('left-drop');
+			}
+			drops.css({
+				'display': ''
+			})
+		}
+
+		positionDrop();
+
+		win.on('resize orientationchange', function(){
+			positionDrop();
+		})
+	})
+}
+
 function initProjects(){
 	var speed = 400;
 	$('.projects-block:has(.filters-list)').each(function(){
@@ -143,12 +170,21 @@ function initProjects(){
 						'position':'absolute',
 						'top': projectF.position().top,
 						'left': projectF.position().left
-					})	
+					}).show()
 				}
 			})
 			target.css({
 				'height': fake.height()
 			})
+		}
+
+		function removeAbsolute(){
+			projects.filter('.filtered').css({
+				'position': 'relative',
+				'top': '',
+				'left': ''
+			})
+			projects.filter(':not(.filtered)').hide();
 		}
 
 		function setAnimation(els){
@@ -214,6 +250,7 @@ function initProjects(){
 			t = setTimeout(function(){
 				removeAnimation(projects);
 				removeAnimation(target);
+				removeAbsolute();
 			}, speed)
 		}
 
